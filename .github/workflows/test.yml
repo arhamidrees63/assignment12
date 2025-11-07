@@ -8,7 +8,6 @@ on:
 
 jobs:
   test:
-    name: Run Unit & Integration Tests
     runs-on: ubuntu-latest
 
     services:
@@ -27,14 +26,15 @@ jobs:
           --health-retries 5
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
-      - name: Cache pip packages
+      - name: Cache pip
         uses: actions/cache@v3
         with:
           path: ~/.cache/pip
@@ -50,58 +50,63 @@ jobs:
           source venv/bin/activate
           pip install --upgrade pip
           pip install -r requirements.txt
+          playwright install
 
-      - name: Run tests with coverage
+      - name: Run tests (unit, integration, e2e)
         env:
           DATABASE_URL: postgresql://user:password@localhost:5432/mytestdb
         run: |
           source venv/bin/activate
-          mkdir -p test-results
-          pytest tests/unit/ --cov=app --junitxml=test-results/junit-unit.xml
-          pytest tests/integration/ --cov=app --junitxml=test-results/junit-integration.xml
-          pytest tests/e2e/ || echo "No E2E tests found, skipping"
+
+          # Unit tests
+          pytest tests/unit/ --cov=app --cov-report=term-missing
+
+          # Integration tests
+          pytest tests/integration/ --cov=app --cov-append --cov-report=term-missing
+
+          # E2E tests
+          pytest tests/e2e/ --cov=app --cov-append --cov-report=term-missing
 
   security:
-    name: Security Scan
     needs: test
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Build image for scan
+      - name: Build Docker image for scan
         run: docker build -t app:test .
 
-    - name: Run Trivy vulnerability scanner
-    uses: aquasecurity/trivy-action@master
-    with:
-      image-ref: 'app:test'
-      format: 'table'
-      exit-code: '0'        # <— prevents build failure on vulnerabilities
-      ignore-unfixed: true
-      severity: 'CRITICAL,HIGH'
-
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: "app:test"
+          format: "table"
+          exit-code: "0"          # don't fail the pipeline on findings
+          ignore-unfixed: true
+          severity: "CRITICAL,HIGH"
 
   deploy:
-    name: Build & Push Docker Image
     needs: security
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
+      - name: Set up Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to Docker Hub
+      - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and Push Docker Image
+      - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           push: true
