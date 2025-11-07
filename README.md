@@ -1,264 +1,182 @@
-# 📦 Project Setup
+🧮 Module 12: User & Calculation Routes + Integration Testing
+👤 Author
 
----
+Muhammad Arham
+GitHub Repository: https://github.com/arhamidrees63/assignment12
+Docker Hub:
+🔗 https://hub.docker.com/r/arhamidrees63/module12
 
-# 🧩 1. Install Homebrew (Mac Only)
+🚀 Objective
 
-> Skip this step if you're on Windows.
+This project implements a complete FastAPI backend featuring:
 
-Homebrew is a package manager for macOS.  
-You’ll use it to easily install Git, Python, Docker, etc.
+Secure User Registration and Login with password hashing and JWT tokens
 
-**Install Homebrew:**
+Full Calculation CRUD (BREAD) operations
 
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
+Comprehensive Integration & Unit Tests using pytest
 
-**Verify Homebrew:**
+Automated CI/CD Pipeline via GitHub Actions and Docker Hub deployment
 
-```bash
-brew --version
-```
+🧰 Tech Stack
+Component	Description
+FastAPI	Modern Python web framework for async APIs
+PostgreSQL	Relational database used for persistence
+SQLAlchemy	ORM for models and database management
+Pydantic v2	Schema validation and type safety
+Pytest + Coverage	Automated testing framework
+Docker & Docker Hub	Containerization and image hosting
+GitHub Actions	Continuous Integration / Continuous Deployment
+⚙️ Setup Instructions (Local Development)
+1️⃣ Clone the Repository
+git clone git@github.com:arhamidrees63/assignment12.git
+cd assignment12
 
-If you see a version number, you're good to go.
-
----
-
-# 🧩 2. Install and Configure Git
-
-## Install Git
-
-- **MacOS (using Homebrew)**
-
-```bash
-brew install git
-```
-
-- **Windows**
-
-Download and install [Git for Windows](https://git-scm.com/download/win).  
-Accept the default options during installation.
-
-**Verify Git:**
-
-```bash
-git --version
-```
-
----
-
-## Configure Git Globals
-
-Set your name and email so Git tracks your commits properly:
-
-```bash
-git config --global user.name "Your Name"
-git config --global user.email "your_email@example.com"
-```
-
-Confirm the settings:
-
-```bash
-git config --list
-```
-
----
-
-## Generate SSH Keys and Connect to GitHub
-
-> Only do this once per machine.
-
-1. Generate a new SSH key:
-
-```bash
-ssh-keygen -t ed25519 -C "your_email@example.com"
-```
-
-(Press Enter at all prompts.)
-
-2. Start the SSH agent:
-
-```bash
-eval "$(ssh-agent -s)"
-```
-
-3. Add the SSH private key to the agent:
-
-```bash
-ssh-add ~/.ssh/id_ed25519
-```
-
-4. Copy your SSH public key:
-
-- **Mac/Linux:**
-
-```bash
-cat ~/.ssh/id_ed25519.pub | pbcopy
-```
-
-- **Windows (Git Bash):**
-
-```bash
-cat ~/.ssh/id_ed25519.pub | clip
-```
-
-5. Add the key to your GitHub account:
-   - Go to [GitHub SSH Settings](https://github.com/settings/keys)
-   - Click **New SSH Key**, paste the key, save.
-
-6. Test the connection:
-
-```bash
-ssh -T git@github.com
-```
-
-You should see a success message.
-
----
-
-# 🧩 3. Clone the Repository
-
-Now you can safely clone the course project:
-
-```bash
-git clone <repository-url>
-cd <repository-directory>
-```
-
----
-
-# 🛠️ 4. Install Python 3.10+
-
-## Install Python
-
-- **MacOS (Homebrew)**
-
-```bash
-brew install python
-```
-
-- **Windows**
-
-Download and install [Python for Windows](https://www.python.org/downloads/).  
-✅ Make sure you **check the box** `Add Python to PATH` during setup.
-
-**Verify Python:**
-
-```bash
-python3 --version
-```
-or
-```bash
-python --version
-```
-
----
-
-## Create and Activate a Virtual Environment
-
-(Optional but recommended)
-
-```bash
+2️⃣ Create and Activate Virtual Environment
 python3 -m venv venv
-source venv/bin/activate   # Mac/Linux
-venv\Scripts\activate.bat  # Windows
-```
+source venv/bin/activate
 
-### Install Required Packages
-
-```bash
+3️⃣ Install Dependencies
 pip install -r requirements.txt
-```
 
----
+4️⃣ Run the Application
+uvicorn app.main:app --reload
 
-# 🐳 5. (Optional) Docker Setup
+5️⃣ Access the API Docs
 
-> Skip if Docker isn't used in this module.
+Swagger UI → http://127.0.0.1:8000/docs
 
-## Install Docker
+ReDoc → http://127.0.0.1:8000/redoc
 
-- [Install Docker Desktop for Mac](https://www.docker.com/products/docker-desktop/)
-- [Install Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
+🧪 Running Tests
+Run All Tests
+pytest --maxfail=1 -v --cov=app --cov-report=term-missing
 
-## Build Docker Image
 
-```bash
-docker build -t <image-name> .
-```
+✅ Example output:
 
-## Run Docker Container
+===================== 101 passed, 1 skipped =====================
+---------- coverage: platform linux, python 3.12 -----------
+TOTAL                          649    165    75%
 
-```bash
-docker run -it --rm <image-name>
-```
+Test Highlights
 
----
+/users/register → User creation with password validation
 
-# 🚀 6. Running the Project
+/users/login → JWT authentication
 
-- **Without Docker**:
+/calculations → Add, Retrieve, Edit, Delete operations
 
-```bash
-python main.py
-```
+Integration tests confirm schema and database behavior
 
-(or update this if the main script is different.)
+🧩 API Endpoints Overview
+👥 User Routes
+Method	Endpoint	Description
+POST	/users/register	Register a new user
+POST	/users/login	Login and generate access token
+🧮 Calculation Routes
+Method	Endpoint	Description
+GET	/calculations	Browse all calculations
+GET	/calculations/{id}	Retrieve a specific calculation
+POST	/calculations	Add a new calculation
+PUT / PATCH	/calculations/{id}	Edit or update a calculation
+DELETE	/calculations/{id}	Delete a calculation
+🧱 Database (PostgreSQL)
 
-- **With Docker**:
+Local .env or config example:
 
-```bash
-docker run -it --rm <image-name>
-```
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=fastapi_db
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
 
----
 
-# 📝 7. Submission Instructions
+To start the database (optional for manual testing):
 
-After finishing your work:
+docker compose up -d
 
-```bash
-git add .
-git commit -m "Complete Module X"
-git push origin main
-```
+🐳 Docker Deployment
+🧩 Image Details
 
-Then submit the GitHub repository link as instructed.
+Docker Hub:
+🔗 https://hub.docker.com/r/arhamidrees63/module12
 
----
+Build the Docker Image
+docker build -t arhamidrees63/module12:latest .
 
-# 🔥 Useful Commands Cheat Sheet
+Run the Container Locally
+docker run -d -p 8000:8000 arhamidrees63/module12:latest
 
-| Action                         | Command                                          |
-| ------------------------------- | ------------------------------------------------ |
-| Install Homebrew (Mac)          | `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"` |
-| Install Git                     | `brew install git` or Git for Windows installer |
-| Configure Git Global Username  | `git config --global user.name "Your Name"`      |
-| Configure Git Global Email     | `git config --global user.email "you@example.com"` |
-| Clone Repository                | `git clone <repo-url>`                          |
-| Create Virtual Environment     | `python3 -m venv venv`                           |
-| Activate Virtual Environment   | `source venv/bin/activate` / `venv\Scripts\activate.bat` |
-| Install Python Packages        | `pip install -r requirements.txt`               |
-| Build Docker Image              | `docker build -t <image-name> .`                |
-| Run Docker Container            | `docker run -it --rm <image-name>`               |
-| Push Code to GitHub             | `git add . && git commit -m "message" && git push` |
 
----
+Now open:
+👉 http://localhost:8000/docs
 
-# 📋 Notes
+Pull from Docker Hub (any system)
 
-- Install **Homebrew** first on Mac.
-- Install and configure **Git** and **SSH** before cloning.
-- Use **Python 3.10+** and **virtual environments** for Python projects.
-- **Docker** is optional depending on the project.
+To run directly from Docker Hub:
 
----
+docker pull arhamidrees63/module12:latest
+docker run -d -p 8000:8000 arhamidrees63/module12:latest
 
-# 📎 Quick Links
+⚙️ GitHub Actions CI/CD
 
-- [Homebrew](https://brew.sh/)
-- [Git Downloads](https://git-scm.com/downloads)
-- [Python Downloads](https://www.python.org/downloads/)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- [GitHub SSH Setup Guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
+Each push triggers:
+
+Build the Docker image
+
+Run all integration + unit tests
+
+Push to Docker Hub on successful test completion
+
+Example Workflow File (.github/workflows/ci.yml)
+name: CI Pipeline
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: fastapi_db
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Tests
+        run: pytest --maxfail=1 -v --cov=app --cov-report=term-missing
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker Image
+        run: docker build -t arhamidrees63/module12:latest .
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "arhamidrees63" --password-stdin
+      - name: Push to Docker Hub
+        run: docker push arhamidrees63/module12:latest
+
+🧠 Reflection
+
+This module was my first full-stack backend integration combining authentication, CRUD operations, and CI/CD. I learned how to structure scalable APIs, validate data using Pydantic, and verify features through comprehensive testing. Automating builds and Docker deployments with GitHub Actions streamlined my development workflow and gave me hands-on experience in real-world DevOps practices.
